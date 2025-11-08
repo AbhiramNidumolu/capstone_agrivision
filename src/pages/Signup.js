@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 //import "./Signup.css";
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 function Signup() {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ function Signup() {
     }
 
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/users/signup/", {
+      const response = await axios.post(`${API_BASE_URL}/api/users/signup/`, {
         ...form,
         role,
       });
@@ -49,7 +50,7 @@ function Signup() {
   const handleOtpVerify = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/users/verify-otp/", {
+      const response = await axios.post(`${API_BASE_URL}/api/users/verify-otp/`, {
         email: form.email,
         otp,
       });
