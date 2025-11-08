@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import "./Dashboard.css";
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 
 function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,7 +27,7 @@ function Dashboard() {
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/images/");
+        const response = await axios.get(`${API_BASE_URL}/api/images`)
         setImages(response.data);
       } catch (error) {
         console.error("Error fetching images:", error);
