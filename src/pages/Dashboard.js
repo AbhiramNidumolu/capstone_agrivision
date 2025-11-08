@@ -3,9 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import "./Dashboard.css";
 
-// Sample crop list for static thumbnails (add all crops as needed)
-const cropList = ["corn", "rice", "wheat", "tomato" /* ...etc. */];
-
 function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("alphabetical");
