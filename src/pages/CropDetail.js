@@ -1,107 +1,105 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./CropDetail.css";
+import "./Upload.css";
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-function CropDetails() {
-  const { name } = useParams();
+
+function Upload() {
   const navigate = useNavigate();
-  const [images, setImages] = useState([]);
-  const [modalImage, setModalImage] = useState(null);
-  const role = localStorage.getItem("role");
+  const token = localStorage.getItem("token");
+  const cropVarieties = ["Rice", "Wheat", "Corn", "Tomato"];
+  const [image, setImage] = useState(null);
+  const [resolutionValid, setResolutionValid] = useState(false);
+  // Use dropdown for crop name selection
+  const [selectedCrop, setSelectedCrop] = useState(cropVarieties[0]);
 
-  useEffect(() => {
-    const fetchGallery = async () => {
-      try {
-        const res = await axios.get(`http://127.0.0.1:8000/api/images/crop/${name}/`);
-        setImages(res.data);
-      } catch (error) {
-        setImages([]);
+  // ✅ Check Image Resolution
+  const checkImageResolution = (file) => {
+    const img = new window.Image();
+    img.onload = function () {
+      const width = img.width;
+      const height = img.height;
+
+      if (width >= 400 && height >= 400) {
+        setResolutionValid(true);
+        alert(`✅ Image resolution OK `);
+      } else {
+        setResolutionValid(false);
+        alert(
+          `❌ Low image resolution (${width} x ${height}). Please upload an image ≥ 400 x 400.`
+        );
       }
     };
-    fetchGallery();
-  }, [name]);
+    img.src = URL.createObjectURL(file);
+  };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this image?")) return;
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImage(file);
+    checkImageResolution(file);
+  };
+
+  const handleUpload = async () => {
+    if (!token) return navigate("/login");
+    if (!resolutionValid)
+      return alert("Image does not meet resolution requirement.");
+
+    const formData = new FormData();
+    formData.append("name", selectedCrop); // Send dropdown value instead of text input
+    formData.append("image", image);
 
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/images/crops/${id}/delete/`);
-      alert("Image deleted successfully");
-      // Refresh images after deletion
-      const res = await axios.get(`http://127.0.0.1:8000/api/images/crop/${name}/`);
-      setImages(res.data);
-      setModalImage(null);
+      await axios.post(
+  `${API_BASE_URL}/api/images/upload`,
+  formData,
+  {
+    headers: {
+      Authorization: `Token ${token}`,
+      'Content-Type': 'multipart/form-data'
+    }
+  }
+);
+      alert("✅ Image uploaded successfully!");
+      navigate("/dashboard");
     } catch (error) {
-      alert("Failed to delete image");
+      console.error(error);
+      alert("Upload failed. Check backend console.");
     }
   };
 
   return (
-    <div className="crop-details">
-      <button
-        className="modal-close-btn"
-        style={{ position: "absolute", right: "35px", top: "35px", fontSize: "2.1em" }}
-        onClick={() => navigate("/dashboard")}
+    <div className="container">
+      <h2>Upload Crop Image</h2>
+
+      {/* Crop Variety Dropdown */}
+      <label htmlFor="crop-variety" >Crop Variety</label>
+      <select
+        id="crop-variety"
+        className="DropDown"
+        value={selectedCrop}
+        onChange={(e) => setSelectedCrop(e.target.value)}
+        required
       >
-        ✕
+        {cropVarieties.map((variety) => (
+          <option key={variety} value={variety}>
+            {variety}
+          </option>
+        ))}
+      </select>
+
+      <input type="file" accept="image/*" onChange={handleImageChange} />
+
+      <button
+        onClick={handleUpload}
+        disabled={!resolutionValid}
+        style={{ marginTop: "10px" }}
+      >
+        Upload
       </button>
-      <div className="crop-details-header" style={{ display: "flex", alignItems: "center", gap: "30px", marginBottom: "22px" }}>
-        <img
-          src={`${process.env.PUBLIC_URL}/crop-thumbnails/${name.toLowerCase()}.jpg`}
-          className="crop-thumb-large"
-          alt={name}
-        />
-        <h1 className="crop-title">{name.charAt(0).toUpperCase() + name.slice(1)}</h1>
-      </div>
-
-      <div className="crop-gallery">
-        {images.length === 0 ? (
-          <div className="no-data">No images found for {name}.</div>
-        ) : (
-          <div className="crop-grid">
-            {images.map((img) => (
-              <div
-                key={img.id}
-                className="crop-img-card"
-                onClick={() => setModalImage(img)}
-              >
-                <img src={img.image_url} alt={img.name} className="crop-img-thumb" />
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {modalImage && (
-        <div className="modal-overlay" onClick={() => setModalImage(null)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <img src={modalImage.image_url} alt="Large" className="modal-large-img" />
-            <div className="modal-meta">
-              <span>
-                Uploaded by: <b>{modalImage.uploaded_by ? modalImage.uploaded_by : "Unknown"}</b>
-              </span>
-              <span>
-                Date: {modalImage.created_at ? new Date(modalImage.created_at).toLocaleDateString() : ""}
-              </span>
-              <a href={modalImage.image_url} download target="_blank" rel="noopener noreferrer">
-                <button className="modal-download-btn">Download</button>
-              </a>
-              {(role === "Admin" || role === "Staff") && (
-                <button
-                  className="modal-delete-btn"
-                  onClick={() => handleDelete(modalImage.id)}
-                >
-                  Delete
-                </button>
-              )}
-            </div>
-            <button className="modal-close-btn" onClick={() => setModalImage(null)}>✕</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
 
-export default CropDetails;
+export default Upload;
