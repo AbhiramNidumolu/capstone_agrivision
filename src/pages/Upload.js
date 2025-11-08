@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Upload.css";
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 
 function Upload() {
   const navigate = useNavigate();
@@ -49,13 +51,16 @@ function Upload() {
     formData.append("image", image);
 
     try {
-      await axios.post("http://127.0.0.1:8000/api/images/upload/", formData, {
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
+      await axios.post(
+  `${API_BASE_URL}/api/images/upload`,
+  formData,
+  {
+    headers: {
+      Authorization: `Token ${token}`,
+      'Content-Type': 'multipart/form-data'
+    }
+  }
+);
       alert("✅ Image uploaded successfully!");
       navigate("/dashboard");
     } catch (error) {
