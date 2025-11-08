@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 //import "./Login.css";
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 function Login() {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ function Login() {
     }
 
     try {
-      const res = await axios.post("http://127.0.0.1:8000/api/users/login/", {
+      const res = await axios.post(`${API_BASE_URL}/api/users/login/`, {
         ...form,
         role,
       });
