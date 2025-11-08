@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 function VerifyOTP() {
   const [email, setEmail] = useState("");
@@ -11,7 +12,7 @@ function VerifyOTP() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://127.0.0.1:8000/api/users/verify-otp/", { email, otp });
+      await axios.post(`${API_BASE_URL}/api/users/verify-otp/`, { email, otp });
       alert("✅ Email verified successfully!");
       navigate("/login");
     } catch (err) {
