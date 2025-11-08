@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './LandingPage.css';  // import the css file
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -8,7 +9,7 @@ const LandingPage = () => {
 
   useEffect(() => {
     // Replace '/api/stats' with your backend stats endpoint 
-    fetch('/api/images/stats')
+    fetch(`${API_BASE_URL}/api/stats`)
       .then(res => res.json())
       .then(data => setStats(data))
       .catch(() => setStats({ images: 6, crops: 4 }));
