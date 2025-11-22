@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-//import "./Login.css";
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 function Login() {
@@ -20,7 +19,6 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Enforce campus email login
     if (!form.email.endsWith("@vitapstudent.ac.in")) {
       alert("Please login using your campus email ID.");
       return;
@@ -32,43 +30,42 @@ function Login() {
         role,
       });
 
-      // ✅ Store token & role in localStorage
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.role);
 
       alert(`Welcome ${role}! Login successful.`);
       navigate("/dashboard");
     } catch (err) {
-      alert("Login failed: " + (err.response?.data?.detail || err.message));
+      // Show full backend error message including detail and full data (for debugging)
+      alert(
+        "Login failed: " +
+        (err.response?.data?.detail ||
+         JSON.stringify(err.response?.data) ||
+         err.message)
+      );
     }
   };
 
   return (
     <div className="signup-wrapper">
-      {/* Side image */}
       <div className="signup-image">
         <img src="/crops.png" alt="Crop Illustration" />
       </div>
 
-      {/* Login form */}
       <div className="container signup-form">
         <h1>Login</h1>
-
-        {/* Role Selection Buttons */}
         <div className="role-buttons">
-  {["Student", "Staff", "Admin"].map((r) => (
-    <button
-      key={r}
-      type="button"
-      onClick={() => setRole(r)}
-      className={`role-btn ${role === r ? "active" : ""}`}
-    >
-      {r}
-    </button>
-  ))}
-</div>
-
-
+          {["Student", "Staff", "Admin"].map((r) => (
+            <button
+              key={r}
+              type="button"
+              onClick={() => setRole(r)}
+              className={`role-btn ${role === r ? "active" : ""}`}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
         <form onSubmit={handleSubmit}>
           <input
             type="email"
@@ -88,7 +85,6 @@ function Login() {
           />
           <button type="submit">Login</button>
         </form>
-
         <p>
           Don’t have an account? <Link to="/signup">Sign up here</Link>
         </p>
