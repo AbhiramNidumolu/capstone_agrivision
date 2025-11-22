@@ -30,19 +30,17 @@ function Signup() {
       const response = await axios.post(`${API_BASE_URL}/api/users/signup/`, {
         ...form,
         role,
-      });
+      }, { headers: { "Content-Type": "application/json" } });
       if (response.status === 201) {
         alert("OTP sent to your campus email. Please verify.");
         setOtpStage(true);
       }
     } catch (err) {
       // Show full backend error details (for debugging + user feedback)
-      alert(
-        "Signup failed: " +
-        (err.response?.data?.error ||
-         JSON.stringify(err.response?.data) ||
-         err.message)
-      );
+      alert("Signup failed: " + (err.response?.data?.error ||
+       JSON.stringify(err.response?.data) ||
+       err.response?.data ||
+       err.message));
     }
   };
 
