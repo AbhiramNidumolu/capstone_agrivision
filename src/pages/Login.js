@@ -28,7 +28,8 @@ function Login() {
       const res = await axios.post(`${API_BASE_URL}/api/users/login/`, {
         ...form,
         role,
-      });
+      },
+      { headers: { "Content-Type": "application/json" } });
 
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.role);
@@ -37,12 +38,10 @@ function Login() {
       navigate("/dashboard");
     } catch (err) {
       // Show full backend error message including detail and full data (for debugging)
-      alert(
-        "Login failed: " +
-        (err.response?.data?.detail ||
-         JSON.stringify(err.response?.data) ||
-         err.message)
-      );
+      alert("Login failed: " + (err.response?.data?.error ||
+       JSON.stringify(err.response?.data) ||
+       err.response?.data ||
+       err.message));
     }
   };
 
