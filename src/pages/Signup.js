@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-//import "./Signup.css";
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 function Signup() {
@@ -15,16 +14,13 @@ function Signup() {
   });
   const [otp, setOtp] = useState("");
 
-  // Handle form input
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Step 1: Signup user & send OTP
   const handleSignup = async (e) => {
     e.preventDefault();
 
-    // Check for campus email
     if (!form.email.endsWith("@vitapstudent.ac.in")) {
       alert("Please use your campus email ID to register.");
       return;
@@ -40,13 +36,16 @@ function Signup() {
         setOtpStage(true);
       }
     } catch (err) {
+      // Show full backend error details (for debugging + user feedback)
       alert(
-        "Signup failed: " + (err.response?.data?.error || err.message)
+        "Signup failed: " +
+        (err.response?.data?.error ||
+         JSON.stringify(err.response?.data) ||
+         err.message)
       );
     }
   };
 
-  // Step 2: Verify OTP
   const handleOtpVerify = async (e) => {
     e.preventDefault();
     try {
@@ -54,14 +53,16 @@ function Signup() {
         email: form.email,
         otp,
       });
-
       if (response.status === 200) {
         alert("Account verified successfully! Please login now.");
         navigate("/login");
       }
     } catch (err) {
       alert(
-        "OTP verification failed: " + (err.response?.data?.error || err.message)
+        "OTP verification failed: " +
+        (err.response?.data?.error ||
+         JSON.stringify(err.response?.data) ||
+         err.message)
       );
     }
   };
@@ -71,28 +72,22 @@ function Signup() {
       <div className="signup-image">
         <img src="/crops.png" alt="Crop Illustration" />
       </div>
-
       <div className="container signup-form">
         {!otpStage ? (
           <>
             <h1>Sign Up</h1>
-
-            {/* Role Selection */}
             <div className="role-buttons">
-  {["Student", "Staff", "Admin"].map((r) => (
-    <button
-      key={r}
-      type="button"
-      onClick={() => setRole(r)}
-      className={`role-btn ${role === r ? "active" : ""}`}
-    >
-      {r}
-    </button>
-  ))}
-</div>
-
-
-            {/* Signup Form */}
+              {["Student", "Staff", "Admin"].map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setRole(r)}
+                  className={`role-btn ${role === r ? "active" : ""}`}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
             <form onSubmit={handleSignup}>
               <input
                 type="text"
@@ -120,7 +115,6 @@ function Signup() {
               />
               <button type="submit">Sign Up</button>
             </form>
-
             <p>
               Already have an account? <Link to="/login">Login here</Link>
             </p>
